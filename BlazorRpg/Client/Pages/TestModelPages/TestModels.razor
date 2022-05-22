@@ -1,0 +1,61 @@
+﻿@page "/testmodels"
+@inject ITestModelClientService TestModelService
+@inject NavigationManager navigationManager
+
+<PageTitle>TestModels</PageTitle>
+<h3>Test Models</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id </th>
+            <th>Name </th>
+            <th>SecondModel</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var testModel in TestModelService.TestModels)
+        {
+            <tr>
+                <td>@testModel.Id</td>
+                <td>@testModel.Name</td>
+                @if(testModel.SecondTestModel != null)
+                { 
+                    <td>@testModel.SecondTestModel.Name</td>
+                }
+                else 
+                {
+                    <td>No Second Test Model</td>
+                }
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowTestModel(testModel.Id))"><i class="oi oi-pencil"></i></button>
+                    <button type="button" class="btn btn-danger" @onclick="(() => DeleteTestModel(testModel.Id))"><i class="oi oi-trash"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="CreateTestModel">Create New Test Model</button>
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await TestModelService.GetAll();
+    }
+
+    void ShowTestModel(int id)
+    {
+        navigationManager.NavigateTo($"testmodel/{id}");
+    }
+
+    void CreateTestModel()
+    {
+        navigationManager.NavigateTo("/testmodel");
+    }
+
+    async Task DeleteTestModel(int Id)
+    {
+        await TestModelService.Delete(Id);
+        navigationManager.NavigateTo("/testmodels");
+    }
+}

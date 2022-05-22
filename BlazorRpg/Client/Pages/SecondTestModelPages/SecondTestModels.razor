@@ -1,0 +1,52 @@
+﻿@page "/secondtestmodels"
+@inject ISecondTestModelClientService SecondTestModelService
+@inject NavigationManager navigationManager
+
+<PageTitle>Second Test Models</PageTitle>
+<h3>Second Test Models</h3>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Id </th>
+            <th>Name </th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach(var secondTestModel in SecondTestModelService.SecondTestModels)
+        {
+            <tr>
+                <td>@secondTestModel.Id</td>
+                <td>@secondTestModel.Name</td>
+                <td>
+                    <button class="btn btn-primary" @onclick="(() => ShowSecondTestModel(secondTestModel.Id))"><i class="oi oi-pencil"></i></button>
+                    <button type="button" class="btn btn-danger" @onclick="(() => Delete(secondTestModel.Id))"><i class="oi oi-trash"></i></button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+<button class="btn btn-primary" @onclick="Create">Create New Second Test Model</button>
+@code {
+
+    protected override async Task OnInitializedAsync()
+    {
+        await SecondTestModelService.GetAll();
+    }
+
+    void ShowSecondTestModel(int id)
+    {
+        navigationManager.NavigateTo($"secondtestmodel/{id}");
+    }
+
+    void Create()
+    {
+        navigationManager.NavigateTo("/secondtestmodel");
+    }
+
+    async Task Delete(int Id)
+    {
+        await SecondTestModelService.Delete(Id);
+        navigationManager.NavigateTo("/secondtestmodels");
+    }
+}
