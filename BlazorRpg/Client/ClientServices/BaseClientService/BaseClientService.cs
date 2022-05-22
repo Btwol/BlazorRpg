@@ -1,5 +1,5 @@
 ﻿//using System.Net.Http.Json;
-
+//
 //namespace BlazorRpg.Client.ClientServices.BaseClientService
 //{
 //    public class BaseClientService<T> : IBaseClientService<T> where T : IBaseModel
