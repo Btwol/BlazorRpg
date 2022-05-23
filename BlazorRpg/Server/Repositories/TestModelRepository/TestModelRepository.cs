@@ -1,4 +1,5 @@
-﻿namespace BlazorRpg.Server.Repositories.TestModelRepository
+﻿
+namespace BlazorRpg.Server.Repositories.TestModelRepository
 {
     public class TestModelRepository : BaseRepository<TestModel>, ITestModelRepository
     {

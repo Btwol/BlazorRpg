@@ -1,6 +1,7 @@
-﻿namespace BlazorRpg.Server.Services
+﻿
+namespace BlazorRpg.Server.Services.BaseService
 {
-    public interface IBaseService<T>
+    public interface IBaseService<T> where T : IBaseModel
     {
         public Task<IEnumerable<T>> GetAll();
         public Task<T> GetById(int id);

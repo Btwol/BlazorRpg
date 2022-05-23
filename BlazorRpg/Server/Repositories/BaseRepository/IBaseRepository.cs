@@ -1,4 +1,4 @@
-﻿namespace BlazorRpg.Server.Repositories
+﻿namespace BlazorRpg.Server.Repositories.BaseRepository
 {
     public interface IBaseRepository<T>
     {

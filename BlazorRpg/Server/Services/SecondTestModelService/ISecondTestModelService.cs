@@ -1,4 +1,5 @@
-﻿namespace BlazorRpg.Server.Services.SecondTestModelService
+﻿
+namespace BlazorRpg.Server.Services.SecondTestModelService
 {
     public interface ISecondTestModelService : IBaseService<SecondTestModel>
     {

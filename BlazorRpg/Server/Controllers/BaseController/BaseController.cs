@@ -1,9 +1,8 @@
-﻿using BlazorRpg.Server.Services;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorRpg.Server.Controllers.BaseController
 {
-    public class BaseController<T> : ControllerBase, IBaseController<T>
+    public class BaseController<T> : ControllerBase, IBaseController<T> where T : IBaseModel
     {
         private readonly IBaseService<T> _service;
 

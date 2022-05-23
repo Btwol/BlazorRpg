@@ -1,5 +1,4 @@
-﻿using BlazorRpg.Server.Data;
-
+﻿
 namespace BlazorRpg.Server.Repositories.BaseRepository
 {
     public class BaseRepository<T> : IBaseRepository<T> where T : class

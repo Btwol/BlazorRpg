@@ -1,5 +1,4 @@
-﻿using BlazorRpg.Client.ClientServices.BaseClientService;
-using System.Net.Http.Json;
+﻿using System.Net.Http.Json;
 
 namespace BlazorRpg.Client.ClientServices.TestModelClientService
 {
