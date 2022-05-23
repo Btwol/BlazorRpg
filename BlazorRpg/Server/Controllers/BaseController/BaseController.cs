@@ -4,7 +4,7 @@ namespace BlazorRpg.Server.Controllers.BaseController
 {
     public class BaseController<T> : ControllerBase, IBaseController<T> where T : IBaseModel
     {
-        private readonly IBaseService<T> _service;
+        protected readonly IBaseService<T> _service;
 
         public BaseController(IBaseService<T> service)
         {

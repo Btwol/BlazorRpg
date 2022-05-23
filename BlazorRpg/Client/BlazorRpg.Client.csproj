@@ -15,4 +15,8 @@
     <ProjectReference Include="..\Shared\BlazorRpg.Shared.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Pages\CharacterPages\" />
+  </ItemGroup>
+
 </Project>
