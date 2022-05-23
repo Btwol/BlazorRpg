@@ -8,7 +8,8 @@ using Microsoft.AspNetCore.ResponseCompression;
 using BlazorRpg.Server.Repositories.TestModelRepository;
 using BlazorRpg.Server.Services.TestModelService;
 using BlazorRpg.Server.Services.SecondTestModelService;
-
+using BlazorRpg.Server.Repositories.CharacterRepository;
+using BlazorRpg.Server.Services.CharacterService;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
@@ -16,11 +17,16 @@ builder.Services.AddRazorPages();
 
 builder.Services.AddDbContext<DataContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("BlazorRpgConnection")));
 builder.Services.AddTransient(typeof(IBaseRepository<>), typeof(BaseRepository<>));
-builder.Services.AddTransient(typeof(ITestModelRepository), typeof(TestModelRepository));
-
 builder.Services.AddTransient(typeof(IBaseService<>), typeof(BaseService<>));
+
+builder.Services.AddScoped(typeof(ITestModelRepository), typeof(TestModelRepository));
+builder.Services.AddScoped(typeof(ICharacterRepository), typeof(CharacterRepository));
+
+
 builder.Services.AddScoped(typeof(ITestModelService), typeof(TestModelService));
 builder.Services.AddScoped(typeof(ISecondTestModelService), typeof(SecondTestModelService));
+builder.Services.AddScoped(typeof(ICharacterService), typeof(CharacterService));
+
 
 var app = builder.Build();
 if (app.Environment.IsDevelopment())
