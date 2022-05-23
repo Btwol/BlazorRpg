@@ -4,6 +4,8 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlazorRpg.Server.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class CharacterController : BaseController<Character>
     {
         public CharacterController(ICharacterService service) : base(service)

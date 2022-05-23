@@ -3,11 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorRpg.Server", "BlazorRpg\Server\BlazorRpg.Server.csproj", "{29BE5082-097F-4D60-AE29-B96E2BA64E4A}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorRpg.Server", "BlazorRpg\Server\BlazorRpg.Server.csproj", "{29BE5082-097F-4D60-AE29-B96E2BA64E4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorRpg.Client", "BlazorRpg\Client\BlazorRpg.Client.csproj", "{007E8207-9581-469A-B9AE-0EEE4E5C78C5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorRpg.Client", "BlazorRpg\Client\BlazorRpg.Client.csproj", "{007E8207-9581-469A-B9AE-0EEE4E5C78C5}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorRpg.Shared", "BlazorRpg\Shared\BlazorRpg.Shared.csproj", "{811D0A49-E140-4F52-A64A-52CBECA759A9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlazorRpg.Shared", "BlazorRpg\Shared\BlazorRpg.Shared.csproj", "{811D0A49-E140-4F52-A64A-52CBECA759A9}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BlazorRpg.Shared.Models
 {
-    public class Character : IBaseModel
+    public class Character : Combatant, IBaseModel
     {
         public int Id { get; set; }
         public string Name { get; set; }

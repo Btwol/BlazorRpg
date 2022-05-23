@@ -1,5 +1,4 @@
-﻿using System.Net.Http.Json;
-
+﻿
 namespace BlazorRpg.Client.ClientServices.SecondTestModelClientService
 {
     public class SecondTestModelClientService : ISecondTestModelClientService

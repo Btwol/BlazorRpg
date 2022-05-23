@@ -1,0 +1,49 @@
+﻿@page "/character-details/{Id:int}"
+@inject ICharacterClientService characterClientService
+
+<PageTitle>Character Details</PageTitle>
+<h3>Character Details</h3>
+
+@{var imgPath = "images/noimage.jpg";}
+<div class = "row bg-light">
+            <div class = "col col-md-2 thumbnail">
+                <img class="img-fluid "  src="@imgPath" asp-append-version="true" />
+            </div>
+            <div class = "col col-md-3">
+                <p>
+                <h3>@character.Name | Class: @character.Class</h3>
+                </p>
+                <p>
+                <h3>LV: @character.Level | EXP: @character.Exp</h3>
+                </p>
+                <button class="btn btn-primary" @onclick="(() => Edit(character.Id))"><i class="oi oi-pencil"></i></button>
+                <button type="button" class="btn btn-danger" @onclick="(() => Delete(character.Id))"><i class="oi oi-trash"></i></button>
+            </div>
+            <div class = "col col-md-1 d-flex flex-column justify-content-center align-item-center"></div>
+            <hr>
+        </div>
+
+@code {
+    [Parameter]
+    public int? Id { get; set; }
+
+    Character character = new Character();
+
+    protected override async Task OnParametersSetAsync()
+    {
+        character = await characterClientService.GetById((int)Id);
+    }
+
+    void Delete(int id)
+    {
+        navigationManager.NavigateTo($"character-details/{id}");
+    }
+    void Edit(int id)
+    {
+        navigationManager.NavigateTo($"character/{id}");
+    }
+    void Create()
+    {
+        navigationManager.NavigateTo($"character");
+    }
+}

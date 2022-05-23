@@ -8,8 +8,10 @@ namespace BlazorRpg.Shared.Models
 {
     public enum CharacterClass
     {
-        Warrior,
+        Fighter,
+        Barbarian,
         Rouge,
-        Mage
+        Mage,
+        Paladin
     }
 }
