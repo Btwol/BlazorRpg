@@ -57,7 +57,7 @@ else
     {
         if (Id == null) 
         {
-            character.Class = CharacterClass.Warrior;
+            character.Class = CharacterClass.Mage;
             await characterClientService.Create(character);
         }
         else await characterClientService.Edit(character);

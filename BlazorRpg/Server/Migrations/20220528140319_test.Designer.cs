@@ -4,6 +4,7 @@ using BlazorRpg.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorRpg.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220528140319_test")]
+    partial class test
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -92,7 +94,7 @@ namespace BlazorRpg.Server.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
-                    b.Property<int?>("CombatantId")
+                    b.Property<int>("CombatantId")
                         .HasColumnType("int");
 
                     b.Property<long>("CurrentHP")
@@ -193,7 +195,9 @@ namespace BlazorRpg.Server.Migrations
                 {
                     b.HasOne("BlazorRpg.Shared.Models.Combatant", "Combatant")
                         .WithMany()
-                        .HasForeignKey("CombatantId");
+                        .HasForeignKey("CombatantId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Combatant");
                 });

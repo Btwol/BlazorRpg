@@ -1,59 +1,73 @@
-﻿using BlazorRpg.Server.Services.CharacterService;
+﻿using BlazorRpg.Server.Repositories.CombatRepository;
+using BlazorRpg.Server.Repositories.TestModelRepository;
+using BlazorRpg.Server.Services.CharacterService;
 
 namespace BlazorRpg.Server.Services.CombatService
 {
-    public class CombatService : ICombatService
+    public class CombatService : BaseService<CurrentCombatant>, ICombatService
     {
-        public Queue<CurrentCombatant> combatantQueue { get; set; }
         public bool ActiveCombat { get; set; } = true;
+        //public Queue<CurrentCombatant> combatantQueue { get; set; }
+        //public List<CurrentCombatant> inactiveCombatants { get; set; }
         private readonly ICharacterService _characterService;
         private readonly Random random = new Random();
 
-        public CombatService(ICharacterService characterService)
+        public CombatService(ICombatRepository repository, ICharacterService characterService) : base(repository)
         {
             _characterService = characterService;
         }
 
-        public async Task InitiateEncounter(List<int> player, List<int> npc)
+        public async Task InitiateCombat(List<CurrentCombatant> currentCombatants)
         {
-            Dictionary<int, CurrentCombatant> combatantInitiativeRoll = new Dictionary<int, CurrentCombatant>();   
-            foreach (int combatantId in player)
-            {
-                Combatant combatant = await _characterService.GetById(combatantId);
-                if (combatant != null) combatantInitiativeRoll.Add(random.Next(100), new CurrentCombatant { Combatant = combatant, IsPlayer = true, Status = true});
-            }
-            foreach (int combatantId in npc)
-            {
-                Combatant combatant = await _characterService.GetById(combatantId);
-                if (combatant != null) combatantInitiativeRoll.Add(random.Next(100), new CurrentCombatant { Combatant = combatant, IsPlayer = false, Status = true });
-            }
+            //ActiveCombat = true;
 
-            combatantInitiativeRoll.OrderBy(c => c.Key);
-            foreach(KeyValuePair<int, CurrentCombatant> combatant in combatantInitiativeRoll) combatantQueue.Enqueue(combatant.Value);
+            foreach (CurrentCombatant currentCombatant in currentCombatants)
+            {
+                var character = await _characterService.GetById((int)currentCombatant.CombatantId);
+                currentCombatant.Initiative = random.Next(100);
+                currentCombatant.CurrentHP = character.HP;
+                currentCombatant.EncounterId = 0;                               //later
+                await _repository.Create(currentCombatant);
+            }
         }
 
-        public async Task NextTurn(int? targetId)
+        private async Task<List<CurrentCombatant>> LoadQueue()
         {
-            if (ActiveCombat)
+            List<CurrentCombatant> currentCombatants = (await base.GetAll()).Where(c => c.EncounterId == 0).ToList();
+            return currentCombatants.OrderBy(c => c.Initiative).ThenBy(c => c.CombatantId).ToList();
+        }
+
+        public async Task<List<CurrentCombatant>> NextTurn(CombatAction combatAction)
+        {
+            List<CurrentCombatant> currentCombatants = await LoadQueue();
+            if (currentCombatants.Any(c => c.Status))
             {
-                CurrentCombatant currentCombatant = combatantQueue.Dequeue();
+                CurrentCombatant currentCombatant = currentCombatants.Where(c => c.Id == combatAction.ActorId).FirstOrDefault();
                 if (currentCombatant.IsPlayer)
                 {
-                    await Attack(currentCombatant.Combatant, await _characterService.GetById((int)targetId));
+                    if (!currentCombatants.Where(c => c.Id == combatAction.TargetId).FirstOrDefault().Status) return await LoadQueue();
                 }
                 else
                 {
-                    int playerCount = combatantQueue.Where(c => c.IsPlayer).Count();
-                    List<CurrentCombatant> Targets = combatantQueue.Where(c => c.IsPlayer && c.Status).ToList();
-                    await Attack(currentCombatant.Combatant, Targets[random.Next(Targets.Count)].Combatant);
+                    List<CurrentCombatant> Targets = currentCombatants.Where(c => c.IsPlayer && c.Status).ToList();
+                    combatAction.TargetId = Targets[random.Next(Targets.Count())].Id;
+                    
                 }
+                CurrentCombatant Target = await Act(currentCombatant, combatAction);
+
+                //if (combatantQueue.Where(c => c.IsPlayer && !c.Status).Count() < 1 || combatantQueue.Where(c => !c.IsPlayer && !c.Status).Count() < 1) ActiveCombat = false;
             }
-            if(combatantQueue.Where(c => c.IsPlayer && !c.Status).Count()<1 || combatantQueue.Where(c => !c.IsPlayer && !c.Status).Count() < 1) ActiveCombat = false;
+            return currentCombatants.ToList();
         }
 
-        public async Task Attack(Combatant attacker, Combatant defender)
+        private async Task<CurrentCombatant> Act(CurrentCombatant Actor, CombatAction combatAction)
         {
-            defender.HP -= attacker.Str;
+            //Combatant Actor = await _characterService.GetById(combatAction.ActorId);
+            CurrentCombatant Target = (await LoadQueue()).Where(c => c.Id == combatAction.TargetId).FirstOrDefault();
+            Target.CurrentHP -= Actor.Combatant.Str;
+            if (Target.CurrentHP <= 0) Target.Status = false;
+            await _repository.Edit(Target);
+            return Target;
         }
     }
 }

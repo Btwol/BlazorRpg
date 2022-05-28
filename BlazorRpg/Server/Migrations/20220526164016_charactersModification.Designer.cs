@@ -4,6 +4,7 @@ using BlazorRpg.Server.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BlazorRpg.Server.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20220526164016_charactersModification")]
+    partial class charactersModification
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -22,7 +24,7 @@ namespace BlazorRpg.Server.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder, 1L, 1);
 
-            modelBuilder.Entity("BlazorRpg.Shared.Models.Combatant", b =>
+            modelBuilder.Entity("BlazorRpg.Shared.Models.Character", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -41,10 +43,6 @@ namespace BlazorRpg.Server.Migrations
 
                     b.Property<int>("Def")
                         .HasColumnType("int");
-
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<long>("Exp")
                         .HasColumnType("bigint");
@@ -79,42 +77,7 @@ namespace BlazorRpg.Server.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Combatant");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Combatant");
-                });
-
-            modelBuilder.Entity("BlazorRpg.Shared.Models.CurrentCombatant", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
-
-                    b.Property<int?>("CombatantId")
-                        .HasColumnType("int");
-
-                    b.Property<long>("CurrentHP")
-                        .HasColumnType("bigint");
-
-                    b.Property<int?>("EncounterId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("Initiative")
-                        .HasColumnType("int");
-
-                    b.Property<bool>("IsPlayer")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("Status")
-                        .HasColumnType("bit");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CombatantId");
-
-                    b.ToTable("CurrentCombatants");
+                    b.ToTable("Characters");
                 });
 
             modelBuilder.Entity("BlazorRpg.Shared.Models.SecondTestModel", b =>
@@ -180,22 +143,6 @@ namespace BlazorRpg.Server.Migrations
                             Name = "T2",
                             SecondTestModelId = 2
                         });
-                });
-
-            modelBuilder.Entity("BlazorRpg.Shared.Models.Character", b =>
-                {
-                    b.HasBaseType("BlazorRpg.Shared.Models.Combatant");
-
-                    b.HasDiscriminator().HasValue("Character");
-                });
-
-            modelBuilder.Entity("BlazorRpg.Shared.Models.CurrentCombatant", b =>
-                {
-                    b.HasOne("BlazorRpg.Shared.Models.Combatant", "Combatant")
-                        .WithMany()
-                        .HasForeignKey("CombatantId");
-
-                    b.Navigation("Combatant");
                 });
 
             modelBuilder.Entity("BlazorRpg.Shared.Models.TestModel", b =>

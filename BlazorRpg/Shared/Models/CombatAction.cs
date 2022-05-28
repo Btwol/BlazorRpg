@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace BlazorRpg.Shared.Models
 {
-    public class Character : Combatant, IBaseModel      //Rename To PlayerCharacter
+    public class CombatAction
     {
-
+        public int ActorId { get; set; }
+        public int? TargetId { get; set; }
+        public int ActionId { get; set; }
     }
 }

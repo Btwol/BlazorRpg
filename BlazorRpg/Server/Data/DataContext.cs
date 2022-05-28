@@ -7,6 +7,7 @@
         public DbSet<TestModel> TestModels { get; set; }
         public DbSet<SecondTestModel> SecondTestModels { get; set; }
         public DbSet<Character> Characters { get; set; }
+        public DbSet<CurrentCombatant> CurrentCombatants { get; set; }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {

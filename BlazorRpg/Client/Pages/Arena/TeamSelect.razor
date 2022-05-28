@@ -1,0 +1,112 @@
+﻿@page "/teamselect"
+@inject ICharacterClientService characterClientService
+@inject ICombatClientService combatClientService
+
+<h3>TeamSelect</h3>
+
+
+<div class="card-deck">
+    @foreach(var character in characterClientService.Characters)
+    {
+        <div class = "row bg-light">
+            <div class = "col col-md-3">
+                <p>
+                <h5>@character.Name | Class: @character.Class | LV: @character.Level | EXP: @character.Exp</h5>
+                </p>
+                <button class="btn btn-primary" @onclick="(() => Add(character.Id, 1))"><i class="oi oi-plus"></i> Add to team 1</button>
+                <button class="btn btn-primary" @onclick="(() => Add(character.Id, 2))"><i class="oi oi-plus"></i> Add to team 2</button>
+            </div>
+            <div class = "col col-md-1 d-flex flex-column justify-content-center align-item-center"></div>
+            <hr>
+        </div>
+    }
+</div>
+
+<h2>Team 1</h2>
+<div class="card-deck">
+    @foreach(var character in Team1)
+    {
+        <div class = "row bg-light">
+            <div class = "col col-md-3">
+                <p>
+                <h5>@character.Name | Class: @character.Class | LV: @character.Level | EXP: @character.Exp</h5>
+                </p>
+                @*<button class="btn btn-primary" @onclick="(() => Remove(combatant))"><i class="oi oi-plus"></i> Remove from Team</button>*@
+            </div>
+            <div class = "col col-md-1 d-flex flex-column justify-content-center align-item-center"></div>
+            <hr>
+        </div>
+    }
+</div>
+
+<h2>Team 2</h2>
+<div class="card-deck">
+    @foreach (var character in Team2)
+    {
+        <div class = "row bg-light">
+            <div class = "col col-md-3">
+                <p>
+                <h5>@character.Name | Class: @character.Class | LV: @character.Level | EXP: @character.Exp</h5>
+                </p>
+                @*<button class="btn btn-primary" @onclick="(() => Remove(combatant))"><i class="oi oi-plus"></i> Remove from Team</button>*@
+            </div>
+            <div class = "col col-md-1 d-flex flex-column justify-content-center align-item-center"></div>
+            <hr>
+        </div>
+    }
+</div>
+
+<button class="btn btn-primary" @onclick="(() => InitiateEncounter())"><i class="oi oi-bolt"></i> Fight!</button>
+<hr>
+
+@code {
+    //List<Character> Team1 = new List<Character>();
+    //List<Character> Team2 = new List<Character>();
+    Dictionary<int, Character> SelectedCharacters = new Dictionary<int, Character>();
+    List<CurrentCombatant> currentCombatants = new List<CurrentCombatant>();
+    List<Character> Team1 = new List<Character>();
+    List<Character> Team2 = new List<Character>();
+
+    protected override async Task OnInitializedAsync()
+    {
+        await characterClientService.GetAll();
+    }
+
+    async Task Add(int id, int team)
+    {
+        //SelectedCharacters.Add(team, await characterClientService.GetById(id));
+        if(team==1) Team1.Add(await characterClientService.GetById(id));
+        if(team==2) Team2.Add(await characterClientService.GetById(id));
+
+        //if (team == 1 && !Team2.Any(c => c.Id == id) && !Team1.Any(c => c.Id == id)) Team1.Add(await characterClientService.GetById(id));
+        //else if (team == 2 && !Team1.Any(c => c.Id == id) && !Team2.Any(c => c.Id == id)) Team2.Add(await characterClientService.GetById(id));
+    }
+
+    async Task Remove(CurrentCombatant character)
+    {
+        //currentCombatants.Remove(currentCombatants.Where(c => c == character).FirstOrDefault());
+    }
+
+    async Task InitiateEncounter()
+    {
+        foreach(Character character in Team1)
+            currentCombatants.Add(new CurrentCombatant { CombatantId = character.Id, IsPlayer = true, Status = true });
+        foreach(Character character in Team2)
+            currentCombatants.Add(new CurrentCombatant { CombatantId = character.Id, IsPlayer = false, Status = true });
+
+
+        //foreach(KeyValuePair<int,Character> characterAndTeam in SelectedCharacters)
+        //{
+        //    if (characterAndTeam.Key == 1)
+        //    currentCombatants.Add(new CurrentCombatant { CombatantId = characterAndTeam.Value.Id, IsPlayer = true, Status = true });
+
+        //else if (characterAndTeam.Key == 2)
+        //    currentCombatants.Add(new CurrentCombatant { CombatantId = characterAndTeam.Value.Id, IsPlayer = false, Status = true });
+
+        //}
+        
+        await combatClientService.InitiateCombat(currentCombatants);
+        navigationManager.NavigateTo("encounter");
+    }
+}
+
