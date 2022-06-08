@@ -19,5 +19,6 @@ namespace BlazorRpg.Shared.Models
         public int? CombatantId { get; set; }
         public int? EncounterId { get; set; } = 0;    //used to differentiate between encounters
         public int Initiative { get; set; }
+        public bool Turn { get; set; } = false;
     }
 }

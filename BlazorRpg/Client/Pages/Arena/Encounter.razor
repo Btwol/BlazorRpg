@@ -33,7 +33,7 @@
                 <h5>@character.Name | Class: @character.Class | LV: @character.Level | EXP: @character.Exp</h5>
                 <h5>HP: @character.HP/@combatant.CurrentHP</h5>
                 </p>
-                @if(turnCounter != -1 && combatClientService.currentCombatants[turnCounter].IsPlayer)
+                @if(currentCombatant.IsPlayer)
                 {
                     <button class="btn btn-primary" @onclick="(() => Target(combatant.Id))"><i class="oi oi-plus"></i> Target</button>
                 }
@@ -43,47 +43,74 @@
         </div>
     }
 </div>
-@if(turnCounter == -1)
+
+@if (activeCombat)
 {
-    <button class="btn btn-primary" @onclick="(() => NextTurn())"><i class="oi oi-plus"></i> Start!</button>
-}
-else if(combatClientService.currentCombatants[turnCounter].IsPlayer)
-{
-    if(@combatClientService.currentCombatants.Where(c => c.Id == targetId).FirstOrDefault() != null)
+    @if (currentCombatant.IsPlayer)
     {
-        <h3>Current Target: @combatClientService.currentCombatants.Where(c => c.Id == targetId).FirstOrDefault().Combatant.Name</h3>
-    }
-    
-    <h3>Current Action: @actionId</h3>
-    <button class="btn btn-primary" @onclick="(() => Action(0))"><i class="oi oi-plus"></i> Attack Action</button>    
+        if (@combatClientService.currentCombatants.Where(c => c.Id == targetId).FirstOrDefault() != null)
+        {
+            <h3>Current Target: @combatClientService.currentCombatants.Where(c => c.Id == targetId).FirstOrDefault().Combatant.Name</h3>
+        }
+        else 
+        {
+            <h3>Current Target: None.</h3>
+        }
+
+        <h3>Current Action: @actionId</h3>
+        <button class="btn btn-primary" @onclick="(() => Action(0))"><i class="oi oi-plus"></i> Attack Action</button>    
+}
+<hr />
+
+<h3>It is @currentCombatant.Combatant.Name Turn</h3>
+<button class="btn btn-primary" @onclick="(() => NextTurn())"><i class="oi oi-plus"></i> Next Turn (Commit)</button>
+}
+@if(!activeCombat)
+{
+    <button class="btn btn-primary" @onclick="(() => EndCombat())"><i class="oi oi-plus"></i> EndCombat</button>
 }
 
-
-<h3>It is @combatClientService.currentCombatants[turnCounter].Combatant.Name Turn</h3>
-<button class="btn btn-primary" @onclick="(() => NextTurn())"><i class="oi oi-plus"></i> Next Turn (Commit)</button>
 @code {
-    int turnCounter = 0;
+    CurrentCombatant currentCombatant;
+    //int turnCounter = 0;
     int actionId;
     int targetId;
+    bool activeCombat = true;
+
     protected override async Task OnInitializedAsync()
     {
         await combatClientService.GetCurrentCombatants();
-        turnCounter = 0;
+        SetCurrentCombatant();
     }
-    async Task Target(int targetId)
+
+    async void SetCurrentCombatant()
+    {
+        currentCombatant = combatClientService.currentCombatants.Where(c => c.Turn).FirstOrDefault();
+    }
+
+    async void Target(int targetId)
     {
         this.targetId = targetId;
     }
-    async Task Action(int actionId)
+
+    async void Action(int actionId)
     {
         this.actionId = actionId;
     }
+
     async Task NextTurn()
     {
-        if(turnCounter != -1)
-            await combatClientService.NextTurn(new CombatAction { ActorId = combatClientService.currentCombatants[turnCounter].Id, ActionId = actionId, TargetId = targetId });
-        turnCounter++;
-        actionId = 0;
+        await combatClientService.NextTurn(new CombatAction { ActorId = currentCombatant.Id, ActionId = actionId, TargetId = targetId });
+        if (!combatClientService.currentCombatants.Where(c => c.IsPlayer).Any(c => c.Status) || !combatClientService.currentCombatants.Where(c => !c.IsPlayer).Any(c => c.Status))
+            activeCombat = false;
+        actionId = -1;
         targetId = 0;
+        SetCurrentCombatant();
+    }
+
+    async Task EndCombat()
+    {
+        await combatClientService.EndCombat();
+        navigationManager.NavigateTo("teamselect");
     }
 }

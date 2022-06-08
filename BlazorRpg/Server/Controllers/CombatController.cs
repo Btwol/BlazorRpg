@@ -31,6 +31,13 @@ namespace BlazorRpg.Server.Controllers
             return Ok();
         }
 
+        [HttpPost("endcombat")]
+        public async Task<IActionResult> EndCombat(string a)
+        {
+            await _service.EndCombat();
+            return Ok();
+        }
+
         [HttpPost("nextturn")]
         public async Task<IActionResult> NextTurn(CombatAction combatAction)
         {

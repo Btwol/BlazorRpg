@@ -29,6 +29,10 @@ namespace BlazorRpg.Server.Services.CombatService
                 currentCombatant.EncounterId = 0;                               //later
                 await _repository.Create(currentCombatant);
             }
+            var firstCombatant = (await _repository.FindAll()).MaxBy(x => x.Initiative);
+            firstCombatant.Turn = true;
+            //firstCombatant.Combatant = null;
+            await _repository.Edit(firstCombatant);
         }
 
         private async Task<List<CurrentCombatant>> LoadQueue()
@@ -55,16 +59,68 @@ namespace BlazorRpg.Server.Services.CombatService
                 }
                 CurrentCombatant Target = await Act(currentCombatant, combatAction);
 
-                //if (combatantQueue.Where(c => c.IsPlayer && !c.Status).Count() < 1 || combatantQueue.Where(c => !c.IsPlayer && !c.Status).Count() < 1) ActiveCombat = false;
+                //Ends current combatants turn
+                currentCombatant.Turn = false;
+                await _repository.Edit(currentCombatant);
+
+                //Set next combatant in initiative queue to active
+                do
+                {
+                    if (currentCombatants[currentCombatants.Count() - 1] == currentCombatant)
+                    {
+                        currentCombatant = currentCombatants[0];
+                        if (currentCombatant.Status) currentCombatant.Turn = true;
+                        await _repository.Edit(currentCombatant);
+                    }
+                    else
+                    {
+                        currentCombatant = currentCombatants[currentCombatants.IndexOf(currentCombatant) + 1];
+                        if(currentCombatant.Status) currentCombatant.Turn = true;
+                        await _repository.Edit(currentCombatant);
+                    }
+                } while(!currentCombatant.Status);
             }
+            currentCombatants = await LoadQueue();
+            if (!currentCombatants.Where(c => c.IsPlayer).Any(c => c.Status) || !currentCombatants.Where(c => !c.IsPlayer).Any(c => c.Status)) ActiveCombat = false;
             return currentCombatants.ToList();
+        }
+
+        public async Task EndCombat()
+        {
+            List<CurrentCombatant> currentCombatants = await LoadQueue();
+            await GrantXP(currentCombatants);
+            foreach(CurrentCombatant currentCombatant in currentCombatants)
+            {
+                await _repository.Delete(currentCombatant);
+            }
+        }
+
+        private async Task GrantXP(List<CurrentCombatant> currentCombatants)
+        {
+            foreach(CurrentCombatant currentCombatant in currentCombatants)
+            {
+                if(currentCombatant.Status)
+                {
+                    if(currentCombatant.IsPlayer)
+                    {
+                        foreach (CurrentCombatant defeatedCombatant in currentCombatants) 
+                            if (!defeatedCombatant.IsPlayer) currentCombatant.Combatant.Exp += defeatedCombatant.Combatant.Level * 10;
+                    }
+                    else if (!currentCombatant.IsPlayer)
+                    {
+                        foreach (CurrentCombatant defeatedCombatant in currentCombatants)
+                            if (defeatedCombatant.IsPlayer) currentCombatant.Combatant.Exp += defeatedCombatant.Combatant.Level * 10;
+                    }
+                    await _characterService.Edit((Character)currentCombatant.Combatant);
+                }
+            }
         }
 
         private async Task<CurrentCombatant> Act(CurrentCombatant Actor, CombatAction combatAction)
         {
             //Combatant Actor = await _characterService.GetById(combatAction.ActorId);
             CurrentCombatant Target = (await LoadQueue()).Where(c => c.Id == combatAction.TargetId).FirstOrDefault();
-            Target.CurrentHP -= Actor.Combatant.Str;
+            Target.CurrentHP -= Actor.Combatant.Str*20;
             if (Target.CurrentHP <= 0) Target.Status = false;
             await _repository.Edit(Target);
             return Target;
