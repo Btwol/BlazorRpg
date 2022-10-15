@@ -12,6 +12,8 @@ using BlazorRpg.Server.Repositories.CharacterRepository;
 using BlazorRpg.Server.Services.CharacterService;
 using BlazorRpg.Server.Services.CombatService;
 using BlazorRpg.Server.Repositories.CombatRepository;
+using BlazorRpg.Server.Services.ResourceProfileService;
+using BlazorRpg.Server.Repositories.ResourceProfileRepository;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
@@ -24,11 +26,13 @@ builder.Services.AddTransient(typeof(IBaseService<>), typeof(BaseService<>));
 builder.Services.AddScoped(typeof(ITestModelRepository), typeof(TestModelRepository));
 builder.Services.AddScoped(typeof(ICharacterRepository), typeof(CharacterRepository));
 builder.Services.AddScoped(typeof(ICombatRepository), typeof(CombatRepository));
+builder.Services.AddScoped(typeof(IResourceProfileRepository), typeof(ResourceProfileRepository));
 
 builder.Services.AddScoped(typeof(ITestModelService), typeof(TestModelService));
 builder.Services.AddScoped(typeof(ISecondTestModelService), typeof(SecondTestModelService));
 builder.Services.AddScoped(typeof(ICharacterService), typeof(CharacterService));
 builder.Services.AddScoped(typeof(ICombatService), typeof(CombatService));
+builder.Services.AddScoped(typeof(IResourceProfileService), typeof(ResourceProfileService));
 
 
 var app = builder.Build();
